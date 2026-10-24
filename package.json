@@ -1,0 +1,24 @@
+{
+  "name": "skypulse-mern-weather",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "SkyPulse Full-Stack MERN Weather Intelligence Application",
+  "scripts": {
+    "install:all": "npm install && npm install --prefix server && npm install --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "dev": "node run-dev.js",
+    "start": "npm start --prefix server",
+    "build": "npm run build --prefix client"
+  },
+  "keywords": [
+    "mern",
+    "weather",
+    "react",
+    "express",
+    "mongodb",
+    "nodejs"
+  ],
+  "author": "",
+  "license": "MIT"
+}
