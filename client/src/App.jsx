@@ -14,6 +14,7 @@ function WeatherAppContent() {
 
   return (
     <>
+      <div className="app-mesh-bg" aria-hidden="true" />
       <BackgroundCanvas />
 
       <div className="app-wrapper">

@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/skypulse';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/isobar';
 
 // Middleware
 app.use(cors());
@@ -29,8 +29,8 @@ async function connectDatabase() {
   } catch (err) {
     app.locals.isDbConnected = false;
     console.warn(`⚠️ [MongoDB] Offline or unreachable (${err.message}).`);
-    console.warn(`ℹ️ [SkyPulse API] Operating with in-memory resilient fallback store.`);
-    console.warn(`💡 [SkyPulse Tip] To connect to MongoDB, start MongoDB locally or specify MONGODB_URI in server/.env.`);
+    console.warn(`ℹ️ [Isobar API] Operating with in-memory resilient fallback store.`);
+    console.warn(`💡 [Isobar Tip] To connect to MongoDB, start MongoDB locally or specify MONGODB_URI in server/.env.`);
   }
 }
 
@@ -45,13 +45,14 @@ app.use('/api/history', historyRoutes);
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
+    system: 'Isobar Atmospheric API',
     timestamp: new Date().toISOString(),
     database: app.locals.isDbConnected ? 'connected' : 'in-memory-fallback'
   });
 });
 
 const httpServer = app.listen(PORT, () => {
-  console.log(`✨ [Express API] SkyPulse server listening on http://localhost:${PORT}`);
+  console.log(`✨ [Isobar API] Server listening on http://localhost:${PORT}`);
 });
 
 httpServer.on('error', (err) => {

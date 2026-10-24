@@ -8,8 +8,8 @@ export function FavoritesBar() {
   if (!favorites || favorites.length === 0) return null;
 
   return (
-    <nav className="favorites-bar-wrapper" aria-label="Favorite locations">
-      <span className="fav-label">Quick Pick:</span>
+    <nav className="favorites-bar-wrapper" aria-label="Monitored stations">
+      <span className="fav-label">Stations:</span>
       <div className="fav-chips-list">
         {favorites.map((city) => {
           const isSelected =
@@ -22,8 +22,8 @@ export function FavoritesBar() {
               className={`fav-chip ${isSelected ? 'active' : ''}`}
               onClick={() => loadWeather(city)}
             >
-              <span className="chip-flag">{getCountryFlag(city.countryCode)}</span>
-              <span className="chip-name">{city.name}</span>
+              <span>{getCountryFlag(city.countryCode)}</span>
+              <span>{city.name}</span>
             </button>
           );
         })}

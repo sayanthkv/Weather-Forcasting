@@ -5,7 +5,7 @@ import { getWeatherInfo } from '../utils/weatherCodes';
 import { Clock } from 'lucide-react';
 
 export function HourlySection() {
-  const { weatherData, unit, convertTemp, hourlyTab, setHourlyTab } = useWeather();
+  const { weatherData, convertTemp, hourlyTab, setHourlyTab } = useWeather();
   const hourly = weatherData?.hourly;
 
   if (!hourly || !hourly.time) return null;
@@ -43,11 +43,11 @@ export function HourlySection() {
   }
 
   return (
-    <section className="glass-card hourly-section" aria-label="24-Hour Forecast">
+    <section className="surface-card hourly-section" aria-label="24-Hour Forecast">
       <div className="section-header">
         <h3 className="section-title">
-          <Clock size={20} />
-          24-Hour Forecast
+          <Clock size={16} />
+          24-Hour Observations
         </h3>
 
         <div className="view-tabs" role="tablist">
@@ -55,13 +55,13 @@ export function HourlySection() {
             className={`tab-btn ${hourlyTab === 'timeline' ? 'active' : ''}`}
             onClick={() => setHourlyTab('timeline')}
           >
-            Timeline
+            Strip
           </button>
           <button
             className={`tab-btn ${hourlyTab === 'chart' ? 'active' : ''}`}
             onClick={() => setHourlyTab('chart')}
           >
-            Trend Curve
+            Curve
           </button>
         </div>
       </div>
@@ -72,14 +72,11 @@ export function HourlySection() {
             <div key={idx} className={`hourly-card ${item.isCurrent ? 'is-current' : ''}`}>
               <span className="hourly-time">{item.label}</span>
               <div className="hourly-icon">
-                <MiniWeatherIcon type={item.iconType} />
+                <CleanMiniIcon type={item.iconType} />
               </div>
               <span className="hourly-temp">{item.temp}°</span>
               {item.pop > 10 ? (
-                <div className="hourly-pop">
-                  <span className="pop-icon">💧</span>
-                  <span className="pop-val">{item.pop}%</span>
-                </div>
+                <div className="hourly-pop">{item.pop}%</div>
               ) : (
                 <div className="hourly-pop-placeholder" />
               )}
@@ -93,61 +90,58 @@ export function HourlySection() {
   );
 }
 
-export function MiniWeatherIcon({ type }) {
+export function CleanMiniIcon({ type }) {
   switch (type) {
     case 'sun':
       return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round">
-          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round">
+          <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
         </svg>
       );
     case 'moon':
     case 'moon-star':
       return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="#93c5fd" strokeWidth="2" strokeLinecap="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
       );
     case 'cloud':
       return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round">
-          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round">
+          <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
         </svg>
       );
     case 'cloud-sun':
       return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round">
-          <path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6z"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round">
+          <path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
         </svg>
       );
     case 'cloud-rain':
     case 'cloud-drizzle':
       return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round">
           <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/>
         </svg>
       );
     case 'cloud-rain-wind':
     case 'cloud-lightning':
       return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" strokeWidth="2" strokeLinecap="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round">
           <path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 10-3 5h4l-3 5"/>
         </svg>
       );
     case 'snowflake':
     case 'cloud-snow':
       return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="#e0f2fe" strokeWidth="2" strokeLinecap="round">
-          <path d="M2 12h20"/><path d="M12 2v20"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#bae6fd" strokeWidth="2" strokeLinecap="round">
+          <path d="M2 12h20"/><path d="M12 2v20"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/>
         </svg>
       );
     default:
       return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round">
-          <path d="M12 2v2"/><circle cx="12" cy="12" r="5"/>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" strokeWidth="2" strokeLinecap="round">
+          <circle cx="12" cy="12" r="4"/>
         </svg>
       );
   }

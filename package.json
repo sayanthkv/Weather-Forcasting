@@ -1,8 +1,8 @@
 {
-  "name": "skypulse-mern-weather",
+  "name": "isobar-weather",
   "version": "1.0.0",
   "type": "module",
-  "description": "SkyPulse Full-Stack MERN Weather Intelligence Application",
+  "description": "Isobar · Precision Atmospheric Observation System",
   "scripts": {
     "install:all": "npm install && npm install --prefix server && npm install --prefix client",
     "dev:server": "npm run dev --prefix server",

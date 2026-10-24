@@ -21,7 +21,7 @@ if (isWindows) {
   }
 }
 
-console.log('🚀 Starting SkyPulse MERN Stack (Express API + Vite React)...');
+console.log('🚀 Starting Isobar Meteorological System (Express API + Vite React)...');
 
 // 2. Start Express Server (port 5000)
 const server = spawn('node', ['server.js'], {

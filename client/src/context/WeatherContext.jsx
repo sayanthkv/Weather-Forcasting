@@ -15,10 +15,10 @@ const DEFAULT_CITY = {
 };
 
 export function WeatherProvider({ children }) {
-  const [unit, setUnitState] = useState(() => localStorage.getItem('skypulse_unit') || 'C');
+  const [unit, setUnitState] = useState(() => localStorage.getItem('isobar_unit') || localStorage.getItem('skypulse_unit') || 'C');
   const [currentLocation, setCurrentLocation] = useState(() => {
     try {
-      const saved = localStorage.getItem('skypulse_last_city');
+      const saved = localStorage.getItem('isobar_last_city') || localStorage.getItem('skypulse_last_city');
       return saved ? JSON.parse(saved) : DEFAULT_CITY;
     } catch (e) {
       return DEFAULT_CITY;
@@ -53,7 +53,7 @@ export function WeatherProvider({ children }) {
     setCurrentLocation(location);
 
     try {
-      localStorage.setItem('skypulse_last_city', JSON.stringify(location));
+      localStorage.setItem('isobar_last_city', JSON.stringify(location));
       const data = await fetchWeather(location.latitude, location.longitude, location.timezone);
       setWeatherData(data);
     } catch (err) {
@@ -70,7 +70,7 @@ export function WeatherProvider({ children }) {
 
   const setUnit = (newUnit) => {
     setUnitState(newUnit);
-    localStorage.setItem('skypulse_unit', newUnit);
+    localStorage.setItem('isobar_unit', newUnit);
   };
 
   // Convert helpers

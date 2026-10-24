@@ -1,7 +1,7 @@
 import React from 'react';
 import { useWeather } from '../context/WeatherContext';
 import { getWeatherInfo } from '../utils/weatherCodes';
-import { MiniWeatherIcon } from './HourlySection';
+import { CleanMiniIcon } from './HourlySection';
 import { Calendar } from 'lucide-react';
 
 export function DailyForecast() {
@@ -15,11 +15,11 @@ export function DailyForecast() {
   const range = weekMax - weekMin || 1;
 
   return (
-    <section className="glass-card daily-forecast-card" aria-label="7-Day Extended Forecast">
+    <section className="surface-card daily-forecast-card" aria-label="7-Day Outlook">
       <div className="section-header">
         <h3 className="section-title">
-          <Calendar size={20} />
-          7-Day Forecast
+          <Calendar size={16} />
+          7-Day Outlook
         </h3>
       </div>
 
@@ -49,13 +49,13 @@ export function DailyForecast() {
 
               <div className="daily-condition">
                 <div className="daily-icon">
-                  <MiniWeatherIcon type={info.icon} />
+                  <CleanMiniIcon type={info.icon} />
                 </div>
                 <span className="daily-desc">{info.description}</span>
               </div>
 
               <div className="daily-pop">
-                {pop > 15 && <span className="badge-pop">🌧 {pop}%</span>}
+                {pop > 10 ? <span className="badge-pop">{pop}%</span> : <span className="daily-pop-empty" />}
               </div>
 
               <div className="daily-temp-bar-container">

@@ -12,30 +12,30 @@ export function Footer() {
     try {
       await loadWeather(currentLocation, true);
     } finally {
-      setTimeout(() => setIsSyncing(false), 600);
+      setTimeout(() => setIsSyncing(false), 500);
     }
   };
 
   const updatedTime = weatherData?.fetchedAt
-    ? new Date(weatherData.fetchedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    : 'Now';
+    ? new Date(weatherData.fetchedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    : 'Live';
 
   return (
     <footer className="app-footer" role="contentinfo">
       <div className="footer-left">
-        <span>Live data updated at {updatedTime}</span>
+        <span>Station Feed Sync: {updatedTime}</span>
         <button
           className={`footer-btn-link ${isSyncing ? 'spinning' : ''}`}
           onClick={handleSync}
-          title="Force refresh meteorological feed"
+          title="Force update observation feed"
         >
-          <RefreshCw size={14} />
-          Sync Now
+          <RefreshCw size={12} />
+          <span>Sync</span>
         </button>
       </div>
 
       <div>
-        <span>Powered by Open-Meteo, Express & MongoDB · MERN Full Stack</span>
+        <span>Isobar · Open-Meteo & BigDataCloud · WMO Numerical Forecast Models</span>
       </div>
     </footer>
   );

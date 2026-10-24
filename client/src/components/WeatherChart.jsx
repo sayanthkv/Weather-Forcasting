@@ -62,9 +62,9 @@ export function WeatherChart() {
     const range = scaleMax - scaleMin || 1;
 
     const svgWidth = 800;
-    const svgHeight = 180;
-    const topMargin = 25;
-    const bottomMargin = 40;
+    const svgHeight = 160;
+    const topMargin = 20;
+    const bottomMargin = 30;
     const usableHeight = svgHeight - topMargin - bottomMargin;
 
     const points = chartData.map((d, i) => {
@@ -74,7 +74,6 @@ export function WeatherChart() {
       return { x, y, ...d };
     });
 
-    // Catmull-Rom to Cubic Bézier path generator
     let pathD = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
     for (let i = 0; i < points.length - 1; i++) {
       const p0 = points[i === 0 ? 0 : i - 1];
@@ -87,7 +86,7 @@ export function WeatherChart() {
       const cp2x = p2.x - (p3.x - p1.x) / 6;
       const cp2y = p2.y - (p3.y - p1.y) / 6;
 
-      d += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+      pathD += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
     }
 
     const areaD = `${pathD} L ${svgWidth} ${svgHeight} L 0 ${svgHeight} Z`;
@@ -132,40 +131,30 @@ export function WeatherChart() {
         onTouchMove={(e) => handlePointer(e.touches[0].clientX)}
         onTouchEnd={() => setTooltip(prev => ({ ...prev, visible: false }))}
       >
-        <svg className="temp-svg" preserveAspectRatio="none" viewBox="0 0 800 220">
+        <svg className="temp-svg" preserveAspectRatio="none" viewBox="0 0 800 160">
           <defs>
-            <linearGradient id="chartGradientReact" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.45" />
-              <stop offset="80%" stopColor="#38bdf8" stopOpacity="0.03" />
-              <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
-            </linearGradient>
-            <linearGradient id="lineGradientReact" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#38bdf8" />
-              <stop offset="50%" stopColor="#60a5fa" />
-              <stop offset="100%" stopColor="#818cf8" />
+            <linearGradient id="isobarChartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.0" />
             </linearGradient>
           </defs>
 
-          {/* Grid lines */}
-          <line x1="0" y1={topMargin} x2={svgWidth} y2={topMargin} stroke="rgba(255,255,255,0.06)" strokeDasharray="4" />
-          <line x1="0" y1={svgHeight - bottomMargin} x2={svgWidth} y2={svgHeight - bottomMargin} stroke="rgba(255,255,255,0.06)" strokeDasharray="4" />
+          {/* Reference grids */}
+          <line x1="0" y1={topMargin} x2={svgWidth} y2={topMargin} stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
+          <line x1="0" y1={svgHeight - bottomMargin} x2={svgWidth} y2={svgHeight - bottomMargin} stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
 
-          {/* Area fill */}
-          <path d={areaD} fill="url(#chartGradientReact)" />
+          {/* Fill and Stroke */}
+          <path d={areaD} fill="url(#isobarChartGrad)" />
+          <path d={pathD} fill="none" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
 
-          {/* Line stroke */}
-          <path d={pathD} fill="none" stroke="url(#lineGradientReact)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-
-          {/* Hover indicator */}
           {tooltip.visible && (
             <>
-              <line x1={tooltip.dotX} y1="0" x2={tooltip.dotX} y2={svgHeight} stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" strokeDasharray="3" />
-              <circle cx={tooltip.dotX} cy={tooltip.dotY} r="6" fill="#ffffff" stroke="#38bdf8" strokeWidth="3" />
+              <line x1={tooltip.dotX} y1="0" x2={tooltip.dotX} y2={svgHeight} stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeDasharray="2" />
+              <circle cx={tooltip.dotX} cy={tooltip.dotY} r="4.5" fill="#f1f5f9" stroke="#38bdf8" strokeWidth="2" />
             </>
           )}
         </svg>
 
-        {/* Labels along X-Axis */}
         <div className="chart-labels">
           {chartData.map((d, i) => {
             if (i % labelStep !== 0) return null;
@@ -179,7 +168,6 @@ export function WeatherChart() {
           })}
         </div>
 
-        {/* Floating tooltip */}
         {tooltip.visible && (
           <div
             className="chart-tooltip"
@@ -188,9 +176,9 @@ export function WeatherChart() {
               transform: 'translate(-50%, -100%)'
             }}
           >
-            <div className="tip-time">{tooltip.time}</div>
-            <div className="tip-temp">{tooltip.temp}°{unit}</div>
-            <div className="tip-rain">🌧 {tooltip.pop}% rain</div>
+            <span className="tip-time">{tooltip.time}</span>
+            <span className="tip-temp">{tooltip.temp}°{unit}</span>
+            <span className="tip-rain">{tooltip.pop}% precip</span>
           </div>
         )}
       </div>

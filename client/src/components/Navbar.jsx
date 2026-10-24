@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useWeather } from '../context/WeatherContext';
 import { searchLocations } from '../services/api';
 import { getCountryFlag } from '../utils/weatherCodes';
-import { Cloud, Search, X, Crosshair, Volume2, VolumeX } from 'lucide-react';
+import { Search, X, Crosshair, Volume2, VolumeX, Compass } from 'lucide-react';
 
 export function Navbar() {
   const {
@@ -16,10 +16,10 @@ export function Navbar() {
 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchWrapperRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     if (query.trim().length < 2) {
@@ -29,23 +29,35 @@ export function Navbar() {
     }
 
     const timer = setTimeout(async () => {
-      setIsSearching(true);
       try {
         const data = await searchLocations(query);
         setResults(data);
         setShowDropdown(true);
         setSelectedIndex(-1);
       } catch (err) {
-        console.error('Search failed:', err);
-      } finally {
-        setIsSearching(false);
+        console.error('Search error:', err);
       }
-    }, 250);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Click outside listener
+  // Global keydown for ⌘K or / to focus search
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        inputRef.current?.focus();
+      } else if (e.key === '/' && document.activeElement !== inputRef.current) {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Click outside to dismiss dropdown
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (searchWrapperRef.current && !searchWrapperRef.current.contains(e.target)) {
@@ -62,15 +74,15 @@ export function Navbar() {
     loadWeather(loc);
   };
 
-  const handleKeyDown = (e) => {
+  const handleInputKeyDown = (e) => {
     if (!showDropdown || results.length === 0) return;
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex(prev => (prev + 1) % results.length);
+      setSelectedIndex((prev) => (prev + 1) % results.length);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex(prev => (prev - 1 + results.length) % results.length);
+      setSelectedIndex((prev) => (prev - 1 + results.length) % results.length);
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (selectedIndex >= 0 && results[selectedIndex]) {
@@ -84,53 +96,63 @@ export function Navbar() {
   return (
     <header className="app-header" role="banner">
       <div className="brand-section">
-        <div className="brand-logo-icon">
-          <Cloud size={24} color="#38bdf8" />
+        <div className="brand-mark" aria-hidden="true">
+          <Compass size={18} strokeWidth={2.2} />
         </div>
-        <div>
-          <h1 className="brand-title">SkyPulse</h1>
-          <p className="brand-subtitle">Atmospheric Intelligence · MERN</p>
+        <div className="brand-meta">
+          <div className="brand-title-row">
+            <span className="brand-title">Isobar</span>
+            <span className="live-indicator">
+              <span className="live-dot" /> LIVE
+            </span>
+          </div>
+          <span className="brand-subtitle">Atmospheric Observation System</span>
         </div>
       </div>
 
       <div className="search-container" ref={searchWrapperRef}>
         <div className="search-wrapper">
-          <span className="search-icon-left">
-            <Search size={18} />
+          <span className="search-icon-left" aria-hidden="true">
+            <Search size={15} />
           </span>
 
           <input
+            ref={inputRef}
             type="text"
             className="search-input"
-            placeholder="Search any global city, state, or country..."
+            placeholder="Search stations, cities, or coordinates..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => { if (results.length > 0) setShowDropdown(true); }}
-            onKeyDown={handleKeyDown}
+            onKeyDown={handleInputKeyDown}
+            autoComplete="off"
+            spellCheck="false"
           />
 
           <div className="search-actions">
-            {query.length > 0 && (
+            {query.length > 0 ? (
               <button
-                className="icon-btn-subtle"
-                onClick={() => { setQuery(''); setShowDropdown(false); }}
-                title="Clear input"
+                className="icon-btn-ghost"
+                onClick={() => { setQuery(''); setShowDropdown(false); inputRef.current?.focus(); }}
+                title="Clear query"
               >
-                <X size={16} />
+                <X size={14} />
               </button>
+            ) : (
+              <span className="search-kbd" title="Shortcut">⌘K</span>
             )}
 
             <button
-              className="icon-btn-subtle"
+              className="icon-btn-ghost"
               onClick={detectCurrentLocation}
-              title="Use current location"
+              title="Locate nearest station"
             >
-              <Crosshair size={18} />
+              <Crosshair size={15} />
             </button>
           </div>
 
           {showDropdown && (
-            <div className="search-dropdown">
+            <div className="search-dropdown" role="listbox">
               {results.length > 0 ? (
                 results.map((loc, idx) => (
                   <div
@@ -138,15 +160,20 @@ export function Navbar() {
                     className={`search-item ${selectedIndex === idx ? 'selected' : ''}`}
                     onClick={() => handleSelect(loc)}
                   >
-                    <span className="search-flag">{getCountryFlag(loc.countryCode)}</span>
-                    <div className="search-meta">
-                      <span className="search-name">{loc.name}</span>
-                      <span className="search-sub">{[loc.admin1, loc.country].filter(Boolean).join(', ')}</span>
+                    <div className="search-item-info">
+                      <span className="search-flag">{getCountryFlag(loc.countryCode)}</span>
+                      <div>
+                        <div className="search-name">{loc.name}</div>
+                        <div className="search-sub">{[loc.admin1, loc.country].filter(Boolean).join(', ')}</div>
+                      </div>
                     </div>
+                    <span className="search-coords">
+                      {Math.abs(loc.latitude).toFixed(2)}°{loc.latitude >= 0 ? 'N' : 'S'}, {Math.abs(loc.longitude).toFixed(2)}°{loc.longitude >= 0 ? 'E' : 'W'}
+                    </span>
                   </div>
                 ))
               ) : (
-                <div className="search-empty">No locations matching "{query}".</div>
+                <div className="search-empty">No meteorological stations found for "{query}".</div>
               )}
             </div>
           )}
@@ -154,15 +181,15 @@ export function Navbar() {
       </div>
 
       <div className="header-actions">
-        <div className="unit-switch-group">
+        <div className="segmented-control" role="group" aria-label="Units">
           <button
-            className={`unit-btn ${unit === 'C' ? 'active' : ''}`}
+            className={`segmented-btn ${unit === 'C' ? 'active' : ''}`}
             onClick={() => setUnit('C')}
           >
             °C
           </button>
           <button
-            className={`unit-btn ${unit === 'F' ? 'active' : ''}`}
+            className={`segmented-btn ${unit === 'F' ? 'active' : ''}`}
             onClick={() => setUnit('F')}
           >
             °F
@@ -170,12 +197,12 @@ export function Navbar() {
         </div>
 
         <button
-          className={`action-pill-btn ${audioPlaying ? 'playing' : ''}`}
+          className={`control-btn ${audioPlaying ? 'active' : ''}`}
           onClick={toggleAudio}
-          title="Toggle weather ambiance soundscape"
+          title="Toggle atmospheric audio synthesis"
         >
-          {audioPlaying ? <Volume2 size={18} /> : <VolumeX size={18} />}
-          <span>{audioPlaying ? 'Mute' : 'Ambiance'}</span>
+          {audioPlaying ? <Volume2 size={14} /> : <VolumeX size={14} />}
+          <span>{audioPlaying ? 'Sound On' : 'Sound Off'}</span>
         </button>
       </div>
     </header>
